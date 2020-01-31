@@ -1,2 +1,31 @@
 
 *.csv
+.DS_Store
+.idea/dataSources.xml
+.idea/modules.xml
+.idea/Project 3.iml
+.idea/sqldialects.xml
+.idea/vcs.xml
+.ipynb_checkpoints/Untitled-checkpoint.ipynb
+data/.DS_Store
+.idea/dataSources.local.xml
+.DS_Store
+.idea/dataSources.xml
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab.xml
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/events.GeEHsw.meta
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/events.GeEHsw/schema/information_schema.FNRwLQ.meta
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/events.GeEHsw/schema/pg_catalog.0S1ZNQ.meta
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/events.GeEHsw/schema/public.abK9xQ.meta
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/names.SNc7Bg.meta
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/names.SNc7Bg/schema/information_schema.FNRwLQ.meta
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/names.SNc7Bg/schema/pg_catalog.0S1ZNQ.meta
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/postgres.edMnLQ.meta
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/postgres.edMnLQ/schema/information_schema.FNRwLQ.meta
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/postgres.edMnLQ/schema/pg_catalog.0S1ZNQ.meta
+.idea/dataSources/a19f12fe-5036-4684-88b7-b369ae5154ab/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta
+.idea/modules.xml
+.idea/Project 3.iml
+.idea/sqldialects.xml
+.idea/vcs.xml
+.idea/workspace.xml
+.ipynb_checkpoints/Untitled-checkpoint.ipynb
