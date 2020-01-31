@@ -1,0 +1,3 @@
+SELECT *
+FROM all_events
+LIMIT 100;
