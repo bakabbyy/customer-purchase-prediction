@@ -6,7 +6,7 @@ CREATE TABLE all_events (
   event_time timestamp,
   event_type text,
   product_id integer,
-  category_id integer,
+  category_id numeric,
   category_code text,
   brand text,
   price numeric,
@@ -14,5 +14,4 @@ CREATE TABLE all_events (
   user_session text
 );
 
-\copy all_events FROM 'data/2019-Oct.csv' DELIMITER ',' CSV;
-\copy all_events FROM 'data/2019-Nov.csv' DELIMITER ',' CSV;
+\copy all_events FROM 'all_data.csv' DELIMITER ',' CSV;

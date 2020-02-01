@@ -1,3 +1,2 @@
-SELECT *
-FROM all_events
-LIMIT 100;
+SELECT COUNT(*)
+FROM all_events;
