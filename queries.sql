@@ -10,7 +10,7 @@ WITH rfm_raw AS (
     SELECT user_id,
            EXTRACT(DAY FROM CURRENT_DATE - MAX(event_time)) AS recency,
            COUNT(DISTINCT user_session) AS frequency,
-           SUM(CASE WHEN event_type = 'purchase' THEN price END) AS monetary_value
+           SUM(CASE WHEN event_type != 'purchase' THEN price END) AS monetary_value
     FROM all_events
     GROUP BY 1
 ),
