@@ -31,3 +31,5 @@ data/.DS_Store
 .ipynb_checkpoints/Untitled-checkpoint.ipynb
 *.jpg
 users.pickle
+*.png
+*.jpeg
