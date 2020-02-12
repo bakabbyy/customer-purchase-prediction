@@ -29,7 +29,7 @@ WHERE user_id NOT IN (
     SELECT DISTINCT user_id
     FROM all_events
     WHERE event_type = 'purchase'
- )
+ );
 
 
 /* create recency, frequency, monetary value calculations (raw calc)
@@ -37,36 +37,34 @@ WHERE user_id NOT IN (
  */
 WITH monetary_value_calc AS (
     SELECT user_id,
-           AVG(added_cart_value) AS monetary_value
+           AVG(product_value) AS monetary_value
     FROM (
          SELECT user_id,
                 user_session,
-                SUM(price) AS added_cart_value
-        FROM all_events
-        WHERE (event_type = 'cart') AND (price > 0)
+                SUM(price) AS product_value
+        FROM base_data_cleaned
+        WHERE event_type != 'purchase'
         GROUP BY 1, 2) AS total_value
     GROUP BY 1
 ),
 rfm_raw AS (
-    SELECT all_events.user_id,
+    SELECT base_data_cleaned.user_id,
            EXTRACT(DAY FROM CURRENT_DATE - MAX(event_time)) AS recency,
            COUNT(DISTINCT user_session) AS frequency,
            COALESCE(AVG(monetary_value), 0) AS monetary_value
-    FROM all_events
+    FROM base_data_cleaned
     LEFT JOIN monetary_value_calc
-        ON all_events.user_id = monetary_value_calc.user_id
-    WHERE event_type != 'remove_from_cart'
+        ON base_data_cleaned.user_id = monetary_value_calc.user_id
     GROUP BY 1
-    HAVING COUNT(DISTINCT user_session) > 1
 ),
 rfm_scores AS (
     SELECT rfm_raw.user_id,
            NTILE(5) OVER(ORDER BY recency) AS r,
            NTILE(5) OVER(ORDER BY frequency) AS f,
            NTILE(5) OVER(ORDER BY monetary_value) AS m
-    FROM all_events
+    FROM base_data_cleaned
     JOIN rfm_raw
-    ON all_events.user_id = rfm_raw.user_id
+    ON base_data_cleaned.user_id = rfm_raw.user_id
 )
 
 SELECT DISTINCT user_id,
@@ -86,32 +84,32 @@ USING(user_id);
 -- count the number of actions of each type per user
 SELECT user_id,
        SUM(CASE WHEN event_type = 'view' THEN 1 ELSE 0 END) AS num_views,
-       SUM(CASE WHEN event_type = 'cart' THEN 1 ELSE 0 END) AS adds_to_cart,
-FROM all_events
+       SUM(CASE WHEN event_type = 'cart' THEN 1 ELSE 0 END) AS adds_to_cart
+FROM base_data_cleaned
 GROUP BY 1;
 
 
 -- only users with more than one session
 SELECT user_id,
-       COUNT(user_session)
+       COUNT(DISTINCT user_session)
 FROM all_events
 GROUP BY 1
-HAVING COUNT(user_session) > 1;
+HAVING COUNT(DISTINCT user_session) > 1;
 
 
 -- add to cart rate
 WITH cart_sessions AS (
-    SELECT all_events.user_id,
+    SELECT base_data_cleaned.user_id,
            add_to_cart_sessions,
            COUNT(user_session) AS total_sessions
-    FROM all_events
+    FROM base_data_cleaned
     JOIN (
         SELECT user_id,
                COUNT(user_session) add_to_cart_sessions
-        FROM all_events
+        FROM base_data_cleaned
         WHERE event_type = 'cart'
         GROUP BY 1) AS adds_to_cart
-        ON all_events.user_id = adds_to_cart.user_id
+        ON base_data_cleaned.user_id = adds_to_cart.user_id
     GROUP BY 1, 2
 )
 
@@ -130,7 +128,7 @@ WITH brand_totals AS (
            COALESCE(brand, 'other') AS brand,
            SUM(CASE WHEN event_type = 'view' THEN 1 ELSE 0 END) AS num_views_per_brand,
            SUM(CASE WHEN event_type = 'cart' THEN 1 ELSE 0 END) AS num_carts_per_brand
-    FROM all_events
+    FROM base_data_cleaned
     GROUP BY 1, 2
 ),
 user_totals AS (
@@ -138,7 +136,7 @@ user_totals AS (
                     COALESCE(brand, 'other') AS brand,
                     SUM(CASE WHEN event_type = 'view' THEN 1 ELSE 0 END) OVER(PARTITION BY user_id) AS user_views,
                     SUM(CASE WHEN event_type = 'cart' THEN 1 ELSE 0 END) OVER(PARTITION BY user_id) AS user_carts
-    FROM all_events
+    FROM base_data_cleaned
 )
 
 SELECT brand_totals.user_id,
@@ -150,3 +148,34 @@ SELECT brand_totals.user_id,
 FROM brand_totals
 JOIN user_totals
     USING(user_id, brand);
+
+-- average number of days between sessions per user
+SELECT user_id,
+       EXTRACT(DAY FROM (MAX(event_time) - MIN(event_time))) AS range_visits,
+       ROUND(CAST(EXTRACT(DAY FROM (MAX(event_time) - MIN(event_time))) /
+                  COUNT(DISTINCT user_session) AS decimal), 2) AS avg_days_btw_sessions
+FROM base_data_cleaned
+GROUP BY 1;
+
+-- average price of products viewed and added to cart
+WITH view_price AS (
+    SELECT user_id,
+           AVG(price) AS avg_view_price
+    FROM base_data_cleaned
+    WHERE event_type = 'view'
+    GROUP BY 1
+),
+cart_price AS (
+    SELECT user_id,
+           AVG(price) AS avg_cart_price
+    FROM base_data_cleaned
+    WHERE event_type = 'cart'
+    GROUP BY 1
+)
+
+SELECT user_id,
+       ROUND(avg_view_price, 2) AS avg_view_price,
+       ROUND(COALESCE(avg_cart_price, 0), 2) AS avg_cart_price
+FROM view_price
+LEFT JOIN cart_price
+USING(user_id);
