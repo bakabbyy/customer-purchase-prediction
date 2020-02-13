@@ -149,6 +149,7 @@ FROM brand_totals
 JOIN user_totals
     USING(user_id, brand);
 
+
 -- average number of days between sessions per user
 SELECT user_id,
        EXTRACT(DAY FROM (MAX(event_time) - MIN(event_time))) AS range_visits,
